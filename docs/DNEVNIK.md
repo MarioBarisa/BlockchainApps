@@ -7,4 +7,4 @@
 - Što je AI napravio drugačije nego što sam očekivao:
 - Što sam dodao u AGENTS.md: Minimalne dopune za odžavanje kvalitete projekta.
 - Provjera:
-- Commit: 1. f8f1bb6f20e65edb39461147bad172cef778adcf , 2.
+- Commit: 1. f8f1bb6f20e65edb39461147bad172cef778adcf , 2. a0d95cc5a7d269390826b66e2290ba21e43d27f9
