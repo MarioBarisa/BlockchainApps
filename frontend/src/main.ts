@@ -1,0 +1,17 @@
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import router from './router'
+import { useThemeStore } from './stores/theme'
+import './assets/main.css'
+
+const app = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+app.use(router)
+
+// Temu primjenjujemo prije prvog rendera da nema bljeska
+useThemeStore(pinia).init()
+
+app.mount('#app')

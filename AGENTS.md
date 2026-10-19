@@ -10,6 +10,7 @@
 - Pametni ugovori (od T4): Solidity ^0.8.24, OpenZeppelin Contracts 5.x,
   Hardhat 3 (ESM, TypeScript), testovi: Mocha + ethers v6
 - Mreža: Sepolia (chainId 11155111)
+- Izgled: DaisyUI
 
 ## Pravila rada
 - Prije pisanja koda predloži kratak plan i pričekaj potvrdu.
@@ -28,6 +29,7 @@
   - Keep the code clean and organized.
   - App specific instructions:
     - dont make up SVG use predefined libraries
-
+    - after each big change do a lint to check for potential issues
+    - after installing packages do vulnerability check of all installed deps.
 ## Greške koje je AI već radio u ovom projektu
 - 
