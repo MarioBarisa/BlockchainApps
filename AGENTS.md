@@ -1,9 +1,9 @@
 # Pravila projekta
 
 ## Projekt
-- Naziv: (upiši)
-- Zajednica: (upiši, npr. kafić "Kod Šime")
-- Opis: (jedna rečenica: što aplikacija radi i za koga)
+- Naziv: (upiši - TBD)
+- Zajednica: (upiši, npr. kafić "Kod Šime" - TBD)
+- Opis: (jedna rečenica: što aplikacija radi i za koga - TBD)
 
 ## Stack (koristi točno ove verzije)
 - Frontend: Vue 3 (script setup), Pinia, Vite, u mapi frontend/
@@ -20,6 +20,14 @@
 - Poruke u require piši bez dijakritike.
 - Nikad ne traži, ne ispisuj i ne spremaj privatne ključeve.
 - Na kraju ukratko objasni što si promijenio i zašto.
+- Dodao student:
+  - Write code optimized for a junior developer to understand. Prefer linear & procedural
+  - Keep the codebase simple and maintainable. Avoid unnecessary complexity.
+  - Follow the existing code style and conventions.
+  - Comments should be only in Croatian, in most important / crucial places and be as short as possible
+  - Keep the code clean and organized.
+  - App specific instructions:
+    - dont make up SVG use predefined libraries
 
 ## Greške koje je AI već radio u ovom projektu
-- (dopunjava student)
+- 
