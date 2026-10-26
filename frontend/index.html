@@ -10,9 +10,14 @@
     <script>
       // Tema se postavlja prije renderiranja da nema bljeska pogresne boje
       ;(() => {
-        const saved = localStorage.getItem('tbd-theme')
+        let saved = null
+        try {
+          saved = localStorage.getItem('tbd-theme')
+        } catch {
+          // Tema radi i kad je lokalna pohrana blokirana.
+        }
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        const mode = saved === 'light' || saved === 'dark' ? saved : dark ? 'dark' : 'light'
+        const mode = saved && saved !== 'system' && /^[a-z]+$/.test(saved) ? saved : dark ? 'dark' : 'light'
         document.documentElement.dataset.theme = mode
       })()
     </script>

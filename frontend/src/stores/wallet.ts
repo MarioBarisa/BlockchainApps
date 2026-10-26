@@ -2,20 +2,11 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { BrowserProvider, formatEther, getAddress, isAddress, parseEther, type Eip1193Provider } from 'ethers'
 import { appConfig } from '@/config/app'
+import { getWalletHistory, type HistoryCursor, type WalletTransaction } from '@/services/walletHistory'
 
 interface WalletProvider extends Eip1193Provider {
   on?: (event: string, listener: () => void) => void
   removeListener?: (event: string, listener: () => void) => void
-}
-
-interface WalletTransaction {
-  hash: string
-  from: string
-  to: string
-  amount: string
-  createdAt: number
-  status: 'pending' | 'confirmed' | 'failed'
-  fee?: string
 }
 
 const sepoliaChainId = `0x${appConfig.network.chainId.toString(16)}`
@@ -41,6 +32,16 @@ export const useWalletStore = defineStore('wallet', () => {
   const refreshError = ref('')
   const updatedAt = ref<number | null>(null)
   const transactions = ref<WalletTransaction[]>([])
+  const historyTransactions = ref<WalletTransaction[]>([])
+  const historyLoading = ref(false)
+  const historyError = ref('')
+  const historyUpdatedAt = ref<number | null>(null)
+  const historyLoaded = ref(false)
+  const nextTransactions = ref<HistoryCursor | null>(null)
+  const nextInternal = ref<HistoryCursor | null>(null)
+  const hasMoreHistory = computed(() => nextTransactions.value !== null || nextInternal.value !== null)
+  let historyController: AbortController | null = null
+  let historyRequestId = 0
   let provider: WalletProvider | null = null
   let timer: ReturnType<typeof setInterval> | undefined
   let revision = 0
@@ -50,7 +51,67 @@ export const useWalletStore = defineStore('wallet', () => {
   const isSepolia = computed(() => chainId.value === sepoliaChainId)
   const shortAddress = computed(() => address.value ? `${address.value.slice(0, 6)}...${address.value.slice(-4)}` : '')
   const balance = computed(() => balanceWei.value === null ? '—' : formatEther(balanceWei.value))
-  const activity = computed(() => transactions.value.filter((tx) => tx.from.toLowerCase() === address.value?.toLowerCase()))
+  const activity = computed(() => {
+    if (!address.value || !isSepolia.value) return []
+    const account = address.value.toLowerCase()
+    const items = new Map<string, WalletTransaction>()
+    for (const tx of [...transactions.value, ...historyTransactions.value]) {
+      if (tx.from.toLowerCase() !== account && tx.to?.toLowerCase() !== account) continue
+      const known = items.get(tx.id)
+      if (known && known.status !== 'pending' && tx.status === 'pending') continue
+      items.set(tx.id, tx)
+    }
+    return [...items.values()].sort((a, b) => (b.createdAt ?? Number.MAX_SAFE_INTEGER) - (a.createdAt ?? Number.MAX_SAFE_INTEGER))
+  })
+
+  function resetHistory() {
+    historyRequestId++
+    historyController?.abort()
+    historyController = null
+    historyTransactions.value = []
+    nextTransactions.value = null
+    nextInternal.value = null
+    historyLoading.value = false
+    historyLoaded.value = false
+    historyUpdatedAt.value = null
+    historyError.value = ''
+  }
+
+  async function loadHistory(older = false) {
+    if (!address.value || !isSepolia.value || historyLoading.value || (older && !hasMoreHistory.value)) return
+    const account = address.value
+    const currentRevision = revision
+    const requestId = ++historyRequestId
+    const controller = new AbortController()
+    historyController = controller
+    historyLoading.value = true
+    historyError.value = ''
+    try {
+      const empty = { items: [] as WalletTransaction[], nextPage: null }
+      const [normal, internal] = await Promise.all([
+        older && !nextTransactions.value ? empty : getWalletHistory(account, 'transactions', older ? nextTransactions.value : null, controller.signal),
+        older && !nextInternal.value ? empty : getWalletHistory(account, 'internal-transactions', older ? nextInternal.value : null, controller.signal),
+      ])
+      if (requestId !== historyRequestId || currentRevision !== revision || address.value !== account || !isSepolia.value) return
+      const items = new Map<string, WalletTransaction>()
+      for (const tx of [...(older ? historyTransactions.value : []), ...normal.items, ...internal.items]) items.set(tx.id, tx)
+      historyTransactions.value = [...items.values()]
+      nextTransactions.value = normal.nextPage
+      nextInternal.value = internal.nextPage
+      historyLoaded.value = true
+      historyUpdatedAt.value = Date.now()
+    } catch {
+      if (requestId === historyRequestId && currentRevision === revision) {
+        historyError.value = 'Povijest trenutačno nije dostupna. Pokušaj ponovno ili otvori Etherscan. Već učitani zapisi ostaju prikazani.'
+      }
+    } finally {
+      controller.abort()
+      if (requestId === historyRequestId) {
+        historyLoading.value = false
+        historyController = null
+      }
+    }
+  }
 
   async function refresh() {
     if (!provider) return
@@ -68,10 +129,12 @@ export const useWalletStore = defineStore('wallet', () => {
       if (address.value !== nextAddress || chainId.value !== network) {
         balanceWei.value = null
         updatedAt.value = null
+        resetHistory()
       }
       address.value = nextAddress
       chainId.value = network
       if (!nextAddress || network !== sepoliaChainId) return
+      if (!historyLoaded.value && !historyLoading.value && !historyError.value) void loadHistory()
       const [rawBalance, receipts] = await Promise.all([
         currentProvider.request({ method: 'eth_getBalance', params: [nextAddress, 'latest'] }) as Promise<string>,
         Promise.all(transactions.value.filter((tx) => tx.status === 'pending').map(async (tx) => ({
@@ -89,6 +152,7 @@ export const useWalletStore = defineStore('wallet', () => {
         tx.fee = formatEther(BigInt(receipt.gasUsed) * BigInt(receipt.effectiveGasPrice))
       }
       refreshError.value = ''
+      if (receipts.some(({ receipt }) => receipt !== null)) void loadHistory()
     } catch (cause) {
       if (currentRevision === revision && requestId === refreshId) {
         balanceWei.value = null
@@ -102,6 +166,7 @@ export const useWalletStore = defineStore('wallet', () => {
 
   function handleChange() {
     revision++
+    resetHistory()
     balanceWei.value = null
     updatedAt.value = null
     chainId.value = null
@@ -111,6 +176,7 @@ export const useWalletStore = defineStore('wallet', () => {
 
   function disconnect() {
     revision++
+    resetHistory()
     refreshId++
     if (timer) clearInterval(timer)
     timer = undefined
@@ -228,7 +294,7 @@ export const useWalletStore = defineStore('wallet', () => {
         return false
       }
       const tx = await signer.sendTransaction({ to: recipient, value, chainId: appConfig.network.chainId, gasLimit: gas })
-      transactions.value.unshift({ hash: tx.hash, from, to: recipient, amount: formatEther(value), createdAt: Date.now(), status: 'pending' })
+      transactions.value.unshift({ id: tx.hash, hash: tx.hash, from, to: recipient, amount: formatEther(value), createdAt: Date.now(), status: 'pending', kind: 'transaction' })
       await refresh()
       return true
     } catch (cause) {
@@ -243,5 +309,6 @@ export const useWalletStore = defineStore('wallet', () => {
   return {
     address, connecting, connected, shortAddress, balance, isSepolia, refreshing,
     sending, error, refreshError, updatedAt, activity, connect, disconnect, switchNetwork, refresh, send,
+    historyLoading, historyError, historyUpdatedAt, historyLoaded, hasMoreHistory, loadHistory,
   }
 })

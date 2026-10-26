@@ -22,7 +22,7 @@ const steps = [
 <template>
   <div class="page-shell space-y-6">
     <!-- Hero -->
-    <section class="app-panel p-5">
+    <section class="app-panel p-4 sm:p-5">
       <div class="grid items-center gap-6 lg:grid-cols-[1.1fr_1fr]">
         <div>
           <span class="badge badge-primary badge-outline gap-1.5 font-semibold">
@@ -36,7 +36,7 @@ const steps = [
           <p class="mt-3 max-w-xl text-sm text-base-content/70">
             {{ appConfig.tagline }}
           </p>
-          <div class="mt-4 flex flex-wrap gap-2">
+          <div class="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
             <RouterLink to="/explore" class="btn btn-primary gap-2 rounded-md">
               Istraži projekte
               <AppIcon name="arrow-right" :size="18" />
@@ -51,9 +51,9 @@ const steps = [
         <!-- Dekorativna kartica umjesto slike -->
         <div class="relative">
           <div class="rounded-lg border border-base-300 bg-base-200/50 p-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="grid size-8 place-items-center rounded-md bg-primary text-primary-content">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex min-w-0 items-center gap-2">
+                <span class="grid size-8 shrink-0 place-items-center rounded-md bg-primary text-primary-content">
                   <AppIcon name="hand-coins" :size="20" />
                 </span>
                 <div>
@@ -61,7 +61,7 @@ const steps = [
                   <p class="text-xs text-base-content/65">Hrana · kvart</p>
                 </div>
               </div>
-              <span class="badge badge-success badge-sm gap-1 font-semibold">
+              <span class="badge badge-success badge-sm shrink-0 gap-1 font-semibold">
                 <AppIcon name="check-circle" :size="12" />
                 aktivno
               </span>

@@ -44,12 +44,12 @@ const filteredProjects = computed(() => {
         <input v-model="search" type="search" class="min-w-0 grow" aria-label="Pretraži projekte" placeholder="Pretraži projekte..." />
       </label>
 
-      <div class="flex flex-wrap gap-1.5">
+      <div class="category-filters flex gap-1.5 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible lg:pb-0">
         <button
           v-for="category in categories"
           :key="category"
           type="button"
-          class="btn btn-sm rounded-md"
+          class="btn btn-sm shrink-0 rounded-md"
           :class="activeCategory === category ? 'btn-primary' : 'btn-ghost border border-base-300'"
           :aria-pressed="activeCategory === category"
           @click="activeCategory = category"

@@ -1,21 +1,27 @@
-import { ref, watch } from 'vue'
+import { computed, onScopeDispose, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import themeNames from 'daisyui/functions/themeOrder'
 
 const STORAGE_KEY = 'tbd-theme'
 
 export const useThemeStore = defineStore('theme', () => {
-  function readInitialTheme() {
+  const media = window.matchMedia('(prefers-color-scheme: dark)')
+  const systemDark = ref(media.matches)
+  let initialized = false
+
+  function readPreference() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved && themeNames.includes(saved)) return saved
     } catch {
       // Tema radi i kad preglednik blokira pohranu.
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dracula' : 'light'
+    return 'system'
   }
 
-  const mode = ref(readInitialTheme())
+  const preference = ref(readPreference())
+  const systemTheme = computed(() => systemDark.value ? 'dark' : 'light')
+  const mode = computed(() => preference.value === 'system' ? systemTheme.value : preference.value)
 
   function applyTheme() {
     const root = document.documentElement
@@ -25,17 +31,35 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   function setTheme(name: string) {
-    if (themeNames.includes(name)) mode.value = name
+    if (name === 'system' || themeNames.includes(name)) preference.value = name
   }
 
-  watch(mode, () => {
+  function handleSystemChange(event: MediaQueryListEvent) {
+    systemDark.value = event.matches
+  }
+
+  function init() {
+    if (!initialized) {
+      media.addEventListener('change', handleSystemChange)
+      initialized = true
+    }
+    systemDark.value = media.matches
     applyTheme()
+  }
+
+  watch(mode, applyTheme, { flush: 'sync' })
+  watch(preference, () => {
     try {
-      localStorage.setItem(STORAGE_KEY, mode.value)
+      if (preference.value === 'system') localStorage.removeItem(STORAGE_KEY)
+      else localStorage.setItem(STORAGE_KEY, preference.value)
     } catch {
       // Odabir ostaje aktivan tijekom ove sesije.
     }
   }, { flush: 'sync' })
 
-  return { mode, themes: themeNames, setTheme, init: applyTheme }
+  onScopeDispose(() => {
+    if (initialized) media.removeEventListener('change', handleSystemChange)
+  })
+
+  return { mode, preference, systemTheme, themes: themeNames, setTheme, init }
 })
