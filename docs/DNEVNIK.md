@@ -8,3 +8,12 @@
 - Što sam dodao u AGENTS.md: Minimalne dopune za odžavanje kvalitete projekta.
 - Provjera:
 - Commit: 1. f8f1bb6f20e65edb39461147bad172cef778adcf , 2. a0d95cc5a7d269390826b66e2290ba21e43d27f9
+
+## T2 — Spajanje na Testnet (datum)
+- Cilj termina: Spojiti se na Sepolia ETH testnet
+- Najkorisniji prompt (kopiran u cijelosti): Napravi izmjene na forntendu da se može user spojiti sa svojim ETH ( Sepolia ) walletom i slati i primati seplia tokene.
+- Što je AI napravio dobro: Dobro je postavio kostur walleta.
+- Što je AI napravio drugačije nego što sam očekivao: --
+- Što sam dodao u AGENTS.md: ništa od zadnji puta
+- Provjera:
+- Commit: 1.  ab8b8ae8177cb42d7acbe001ff6ae734b90e50f3
