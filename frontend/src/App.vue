@@ -6,10 +6,10 @@ import AppDock from '@/components/AppDock.vue'
 
 <template>
   <!-- Na mobitelu cijela stranica ima odmak za fiksni dock -->
-  <div class="flex min-h-dvh flex-col bg-base-200/40 pb-20 md:pb-0">
+  <div class="flex min-h-dvh flex-col bg-base-200 pb-20 md:pb-0">
     <AppNavbar />
 
-    <main class="flex-1">
+    <main class="min-w-0 flex-1">
       <RouterView />
     </main>
 

@@ -11,16 +11,16 @@ defineProps<{
 </script>
 
 <template>
-  <div class="rounded-3xl border border-base-300/70 bg-base-100 p-5 shadow-sm">
+  <div class="app-panel p-4">
     <div class="flex items-center gap-3">
-      <span class="grid size-11 place-items-center rounded-2xl bg-primary/12 text-primary">
-        <AppIcon :name="icon" :size="22" />
+      <span class="grid size-9 place-items-center rounded-md bg-primary/12 text-primary">
+        <AppIcon :name="icon" :size="18" />
       </span>
       <div>
-        <p class="text-2xl font-extrabold leading-none">{{ value }}</p>
-        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-base-content/50">{{ title }}</p>
+        <p class="font-mono text-xl font-semibold leading-none tabular-nums">{{ value }}</p>
+        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-base-content/65">{{ title }}</p>
       </div>
     </div>
-    <p class="mt-3 text-sm text-base-content/60">{{ hint }}</p>
+    <p class="mt-2 text-xs text-base-content/70">{{ hint }}</p>
   </div>
 </template>

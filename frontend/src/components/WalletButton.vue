@@ -10,8 +10,8 @@ const wallet = useWalletStore()
   <button
     v-if="!wallet.connected"
     type="button"
-    class="btn btn-primary btn-sm gap-2 rounded-xl sm:btn-md"
-    :disabled="wallet.connecting"
+    class="btn btn-primary btn-sm gap-2 rounded-md"
+    :disabled="wallet.connecting || wallet.sending"
     @click="wallet.connect()"
   >
     <span v-if="wallet.connecting" class="loading loading-spinner loading-xs"></span>
@@ -21,29 +21,34 @@ const wallet = useWalletStore()
   </button>
 
   <div v-else class="dropdown dropdown-end">
-    <button tabindex="0" type="button" class="btn btn-outline btn-sm gap-2 rounded-xl border-base-300 sm:btn-md">
-      <span class="size-2 rounded-full bg-success"></span>
+    <button tabindex="0" type="button" class="btn btn-outline btn-sm gap-2 rounded-md border-base-300">
+      <span class="size-2 rounded-full" :class="wallet.isSepolia ? 'bg-success' : 'bg-warning'"></span>
       <span class="font-mono text-xs sm:text-sm">{{ wallet.shortAddress }}</span>
       <AppIcon name="caret-down" :size="14" />
     </button>
     <ul
       tabindex="0"
-      class="dropdown-content z-50 mt-2 w-64 space-y-3 rounded-2xl border border-base-300 bg-base-100 p-4 shadow-xl"
+      class="dropdown-content z-50 mt-2 w-64 space-y-2 rounded-md border border-base-300 bg-base-100 p-3 shadow-lg"
     >
       <li class="flex items-center justify-between text-sm">
-        <span class="text-base-content/60">Mreža</span>
-        <span class="font-semibold">Sepolia</span>
+        <span class="text-base-content/70">Mreža</span>
+        <span class="font-semibold">{{ wallet.isSepolia ? 'Sepolia' : 'Druga mreža' }}</span>
       </li>
       <li class="flex items-center justify-between text-sm">
-        <span class="text-base-content/60">Saldo</span>
-        <span class="font-semibold">{{ wallet.balance }} ETH</span>
+        <span class="text-base-content/70">Saldo</span>
+        <span class="ml-2 min-w-0 break-all text-right font-semibold">{{ wallet.balance }} ETH</span>
       </li>
       <li>
-        <button type="button" class="btn btn-ghost btn-sm w-full justify-start gap-2" @click="wallet.disconnect()">
+        <RouterLink to="/profile" class="btn btn-primary btn-sm mb-2 w-full">Saldo i transakcije</RouterLink>
+        <button type="button" class="btn btn-ghost btn-sm w-full justify-start gap-2" :disabled="wallet.sending || wallet.connecting" @click="wallet.disconnect()">
           <AppIcon name="sign-out" :size="18" />
           Odspoji wallet
         </button>
       </li>
     </ul>
+  </div>
+  <div v-if="wallet.error && !wallet.connected" role="alert" class="fixed inset-x-4 top-16 z-50 mx-auto max-w-lg rounded-md border border-error bg-base-100 p-4 text-sm shadow-lg">
+    <p>{{ wallet.error }}</p>
+    <button type="button" class="btn btn-ghost btn-xs mt-2" @click="wallet.error = ''">Zatvori</button>
   </div>
 </template>

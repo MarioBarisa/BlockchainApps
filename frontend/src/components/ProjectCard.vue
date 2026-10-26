@@ -16,30 +16,30 @@ const progress = computed(() => {
 
 <template>
   <article
-    class="group flex h-full flex-col rounded-3xl border border-base-300/70 bg-base-100 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+    class="app-panel flex h-full flex-col p-4"
   >
     <div class="flex items-start justify-between gap-3">
-      <span class="grid size-12 place-items-center rounded-2xl bg-secondary/15 text-secondary">
-        <AppIcon :name="project.icon" :size="24" />
+      <span class="grid size-8 place-items-center rounded-md bg-secondary/15 text-secondary">
+        <AppIcon :name="project.icon" :size="18" />
       </span>
       <span class="badge badge-ghost badge-sm font-semibold">{{ project.category }}</span>
     </div>
 
-    <h3 class="mt-4 text-lg font-bold leading-snug">{{ project.title }}</h3>
-    <p class="mt-1 flex-1 text-sm text-base-content/60">{{ project.description }}</p>
+    <h3 class="mt-3 text-sm font-bold leading-snug">{{ project.title }}</h3>
+    <p class="mt-1 flex-1 text-sm text-base-content/70">{{ project.description }}</p>
 
-    <div class="mt-4">
+    <div class="mt-3 border-t border-base-300 pt-3">
       <div class="mb-1.5 flex items-baseline justify-between text-sm">
-        <span class="font-bold">{{ project.raised }} ETH</span>
-        <span class="text-xs text-base-content/50">cilj {{ project.goal }} ETH</span>
+        <span class="font-mono font-semibold tabular-nums">{{ project.raised }} ETH</span>
+        <span class="text-xs text-base-content/65">cilj {{ project.goal }} ETH</span>
       </div>
-      <progress class="progress progress-primary h-2 w-full" :value="progress" max="100"></progress>
-      <div class="mt-2 flex items-center justify-between text-xs text-base-content/50">
+      <progress class="progress progress-primary h-1.5 w-full" :value="progress" max="100"></progress>
+      <div class="mt-2 flex items-center justify-between text-xs text-base-content/65">
         <span class="inline-flex items-center gap-1">
           <AppIcon name="users-three" :size="14" />
           {{ project.supporters }} podupiratelja
         </span>
-        <span class="font-semibold text-primary">{{ progress }}%</span>
+        <span class="font-mono font-semibold text-primary">{{ progress }}%</span>
       </div>
     </div>
   </article>

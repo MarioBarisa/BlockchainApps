@@ -25,6 +25,8 @@ import notePencil from '@iconify-icons/ph/note-pencil'
 import arrowRight from '@iconify-icons/ph/arrow-right'
 import arrowUpRight from '@iconify-icons/ph/arrow-up-right'
 import info from '@iconify-icons/ph/info'
+import qrCode from '@iconify-icons/ph/qr-code'
+import palette from '@iconify-icons/ph/palette'
 
 // Ikone se uvoze pojedinacno da u bundle ne udje cijela kolekcija
 export const icons = {
@@ -55,6 +57,8 @@ export const icons = {
   'arrow-right': arrowRight,
   'arrow-up-right': arrowUpRight,
   info,
+  'qr-code': qrCode,
+  palette,
 }
 
 export type IconName = keyof typeof icons

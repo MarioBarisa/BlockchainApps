@@ -1,44 +1,41 @@
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-
-export type ThemeMode = 'light' | 'dark'
+import themeNames from 'daisyui/functions/themeOrder'
 
 const STORAGE_KEY = 'tbd-theme'
 
-// Boja adresne trake na mobitelu (meta theme-color ne prima oklch)
-const THEME_COLORS: Record<ThemeMode, string> = {
-  light: '#ffffff',
-  dark: '#1d232a',
-}
-
 export const useThemeStore = defineStore('theme', () => {
-  // Ako korisnik nije odabrao temu, pratimo postavku uredaja
-  function readInitialMode(): ThemeMode {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === 'light' || saved === 'dark') return saved
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  function readInitialTheme() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved && themeNames.includes(saved)) return saved
+    } catch {
+      // Tema radi i kad preglednik blokira pohranu.
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dracula' : 'light'
   }
 
-  const mode = ref<ThemeMode>(readInitialMode())
-  const isDark = computed(() => mode.value === 'dark')
+  const mode = ref(readInitialTheme())
 
   function applyTheme() {
-    document.documentElement.dataset.theme = mode.value
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLORS[mode.value])
+    const root = document.documentElement
+    root.dataset.theme = mode.value
+    const background = getComputedStyle(root).getPropertyValue('--color-base-100').trim()
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background)
   }
 
-  function init() {
-    applyTheme()
-  }
-
-  function toggle() {
-    mode.value = isDark.value ? 'light' : 'dark'
+  function setTheme(name: string) {
+    if (themeNames.includes(name)) mode.value = name
   }
 
   watch(mode, () => {
-    localStorage.setItem(STORAGE_KEY, mode.value)
     applyTheme()
-  })
+    try {
+      localStorage.setItem(STORAGE_KEY, mode.value)
+    } catch {
+      // Odabir ostaje aktivan tijekom ove sesije.
+    }
+  }, { flush: 'sync' })
 
-  return { mode, isDark, init, toggle }
+  return { mode, themes: themeNames, setTheme, init: applyTheme }
 })

@@ -11,15 +11,15 @@ const items: Array<{ to: string; label: string; icon: IconName }> = [
 
 <template>
   <!-- Donja navigacija samo na mobitelu; od md nav gore preuzima navbar -->
-  <nav class="dock md:hidden" aria-label="Mobilna navigacija">
+  <nav class="dock border-t border-base-300 bg-base-100 md:hidden" aria-label="Mobilna navigacija">
     <RouterLink
       v-for="item in items"
       :key="item.to"
       :to="item.to"
-      class="text-base-content/60"
-      active-class="text-primary"
+      class="text-base-content/70"
+      exact-active-class="text-primary"
     >
-      <AppIcon :name="item.icon" :size="24" />
+      <AppIcon :name="item.icon" :size="20" />
       <span class="dock-label">{{ item.label }}</span>
     </RouterLink>
   </nav>
