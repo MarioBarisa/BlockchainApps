@@ -16,4 +16,4 @@
 - Što je AI napravio drugačije nego što sam očekivao: --
 - Što sam dodao u AGENTS.md: ništa od zadnji puta
 - Provjera:
-- Commit: 1.  ab8b8ae8177cb42d7acbe001ff6ae734b90e50f3
+- Commit: 1. ab8b8ae8177cb42d7acbe001ff6ae734b90e50f3 , 2. 61f5efb68fcb85e4ce34e4f996ad78fafd0739cf
