@@ -24,8 +24,7 @@
 - Što je AI napravio dobro: Relativno dobro je pohavato osnovnu ideju pametnog ugovora.
 - Što je AI napravio drugačije nego što sam očekivao: Išao je komplicirati bez potrebe.
 - Što sam dodao u AGENTS.md: ništa od zadnji puta
-- Recenzija aktualnog [SPEC.md](</Users/mariobarisa/Documents/ChatGPT/Blockchain aplikacije/docs/SPEC.md>). Predloženi kriteriji u tablici nisu uneseni u datoteku.
-
+- 
 | ID | Vrsta | Točan odjeljak | Nalaz | Predloženi kriterij prihvaćanja |
 | --- | --- | --- | --- | --- |
 | N1 | Moguća administratorska zlouporaba | **Funkcije → Token: ProofNewsToken → setRegistry**; **Odluke o tokenu** | `setRegistry` provjerava samo da adresa ima kod. Vlasnik može povezati ugovor koji poziva `mintProof` bez registriranja dokaza. Time prestaje vrijediti tvrdnja da PNP saldo predstavlja broj registracija. Pogrešna veza ujedno je nepovratna. | **Zadano:** kandidat za registar ima kod, ali nije dopuštena implementacija ProofNewsRegistry ili njegov `token()` pokazuje na drugi token. **Kada:** vlasnik pozove `setRegistry`. **Tada:** poziv pada s `"Neispravan registar"` i veza ostaje nepostavljena. Specifikacija mora odrediti kako se prepoznaje dopuštena implementacija; sama prisutnost koda nije dovoljna. |
@@ -39,4 +38,11 @@
 | N9 | Nedovoljno određen kriterij provjere | **Kriteriji prihvaćanja → K28** | K28 tvrdi da ključ nije pohranjen ili zabilježen, ali ne određuje koje se pohrane, dnevnici i izlazi pregledavaju. Bez definiranog opsega provjere nije jasno što predstavlja dokaz prolaska, osobito kod grešaka i posredničkog HTTP zapisivanja. | **Zadano:** test koristi prepoznatljiv probni API ključ i odvojeno simulira uspjeh, provider grešku i grešku baze. **Kada:** svaki zahtjev završi. **Tada:** ključ se ne pojavljuje u MongoDB-u, preglednikovoj pohrani, aplikacijskim/proxy logovima ni javnim odgovorima; novi zahtjev bez ključa vraća `"API kljuc je obavezan"`. |
 | N10 | Nepokrivena granica ulaza | **Odluke o modulu → AI servisi, izvori i ulazna ograničenja**; **K21, K23** | „Unicode znak” nije dovoljno precizna jedinica. Broj Unicode kodnih točaka, UTF-16 jedinica i vizualnih znakova može se razlikovati. Različite implementacije zato mogu različito prihvaćati iste promptove na granici. | **Zadano:** duljina se definira brojem Unicode kodnih točaka, a testni AI adapter prihvaća zahtjev. **Kada:** korisnik pošalje prompt od 10.000 znakova izvan osnovne Unicode ravnine, zatim od 10.001 takvog znaka. **Tada:** prvi prolazi provjeru duljine, a drugi vraća HTTP 400 i `"Prompt je predug"`. |
 | N11 | Nepokriven slučaj razvojnog okruženja | **Opis → Blockchain**; **Potpisana potvrda ProofNewsa**; **K39, K59** | Nije obrađen reset Remix VM-a nakon kojeg se mogu ponoviti chainId, adresa ugovora, potpisnik i njegova verzija. Ako su svi potpisani podaci ponovno isti, stara potvrda nema oznaku koja razlikuje dvije instance deploymenta. EIP-712 razlikuje samo uključena polja domene. ([EIP-712](https://eips.ethereum.org/EIPS/eip-712#definition-of-domainseparator)) | **Zadano:** sačuvana je potvrda prije reseta VM-a, a novi deployment ponavlja chainId i adresu registra. **Kada:** korisnik pokuša staru potvrdu na novoj instanci. **Tada:** registracija pada s `"Nevaljana potvrda ProofNewsa"`. Specifikacija treba odrediti razlikovanje instanci, primjerice jedinstvenom domenom ili obveznim novim potpisnikom. |
-- Commit: 
+- Commit: 1. 96837748cf70484ad8926e88a07eb3a4379f0e83
+
+## T3 sucelje i sljedivost
+- Cilj termina: Napraviti osnovnu specifikaciju aplikacije
+- Najkorisniji prompt (kopiran u cijelosti): Promptovi sa 3. Vježbe ( svi )
+- Što je AI napravio dobro: Relativno dobro je pohavato osnovnu ideju pametnog ugovora.
+- Što je AI napravio drugačije nego što sam očekivao: Išao je komplicirati bez potrebe.
+- Što sam dodao u AGENTS.md: ništa od zadnji puta
