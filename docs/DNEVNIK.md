@@ -68,6 +68,7 @@
 - Što je AI napravio drugačije nego što sam očekivao: -
 - Što sam dodao u AGENTS.md: -
 - Model: GPT 6.1 Sol High
+- Commit: 1. d3d8f96884962fe8f0b9168d19ee3dce88a7dbdf
 
 ### Provjera tokena u Remix VM-u 
 
