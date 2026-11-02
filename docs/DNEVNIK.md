@@ -54,9 +54,35 @@
  
 ## T3: sucelje i sljedivost
 - Cilj termina: Napraviti osnovni blockchian backbone
-- Najkorisniji prompt (kopiran u cijelosti): Promptovi sa 3. Vježbe ( svi )
+- Najkorisniji prompt (kopiran u cijelosti): -
 - Što je AI napravio dobro: Relativno dobro je pohavato osnovnu ideju pametnog ugovora.
 - Što je AI napravio drugačije nego što sam očekivao: ništa
 - Što sam dodao u AGENTS.md: 'Ne diraj git osim ako te ja to ne pitam.'
 - Model: GPT 6.1 Sol High
-- Commit: 
+- Commit: 1. 1e4244b1b61385eaa02081d37a2b624ba5dfd1b3
+
+## T3: token
+- Cilj termina: Porvjera rada na RemixVM
+- Najkorisniji prompt (kopiran u cijelosti): -
+- Što je AI napravio dobro: -
+- Što je AI napravio drugačije nego što sam očekivao: -
+- Što sam dodao u AGENTS.md: -
+- Model: GPT 6.1 Sol High
+
+### Provjera tokena u Remix VM-u 
+
+Ugovor: ProofNewsToken, adresa `0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95`.
+
+- Račun A (početni vlasnik): `0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2`.
+- Račun B (novi vlasnik nakon K14): `0x5B38Da6a701c568545dCfcB03FcB875f56beddC4`.
+- Dokazi provjere: stvarni izlazi iz Remix VM konzole koje je dostavio korisnik.
+
+| Kriterij | Što sam kliknuo | Očekivano | Dobiveno (poruka iz konzole) |
+| --- | --- | --- | --- |
+| K14 — uspješan prijenos vlasništva | S računa A pozvao `transferOwnership(B)`, uz Value 0 wei. | Transakcija uspijeva, vlasništvo prelazi s A na B i emitira se `OwnershipTransferred(A,B)`. | `status: 1 Transaction mined and execution completed`; `logs: 1`; događaj `OwnershipTransferred` navodi A kao prethodnog, a B kao novog vlasnika. |
+| K13 — zabrana neovlaštenog upravljanja | Nakon K14 s računa A ponovno pozvao `transferOwnership(address)`. | Poziv pada s porukom `Nisi vlasnik` jer A više nije vlasnik. | Transakcija je poništena (`revert`); `Reason provided by the contract: "Nisi vlasnik"`; `logs: 0`. |
+| K10 — zabrana prijenosa tokena | S računa B pozvao `transfer(address,uint256)`. | Poziv pada s porukom `Prijenos tokena nije dopusten`. | Poziv (`call`) završava s `revert`; `Reason provided by the contract: "Prijenos tokena nije dopusten"`. |
+
+Transakcija K14: `0x776d3a7328c6673ee0b950f823e3a7fa5f6c841c7b378312bd0949c8f4569bb9`; blok 3; trošak transakcije 29.051 gas.
+
+Zaključak: sva tri dostavljena rezultata odgovaraju očekivanim ishodima iz specifikacije. U dostavljenim izlazima nisu utvrđena odstupanja koja zahtijevaju ispravak koda ili SPEC-a. K10 zabilježen je kao call, a ne kao nova transakcija. Nakon K14 vlasnička adresa je račun B.
