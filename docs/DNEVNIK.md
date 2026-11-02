@@ -6,6 +6,7 @@
 - Što je AI napravio dobro: Dobro je postavio kostur projekta.
 - Što je AI napravio drugačije nego što sam očekivao:
 - Što sam dodao u AGENTS.md: Minimalne dopune za odžavanje kvalitete projekta.
+- Model: Deepseek V4.1 high
 - Provjera:
 - Commit: 1. f8f1bb6f20e65edb39461147bad172cef778adcf , 2. a0d95cc5a7d269390826b66e2290ba21e43d27f9
 
@@ -15,6 +16,7 @@
 - Što je AI napravio dobro: Dobro je postavio kostur walleta.
 - Što je AI napravio drugačije nego što sam očekivao: --
 - Što sam dodao u AGENTS.md: ništa od zadnji puta
+- Model: GPT 6.1 Sol medium
 - Provjera:
 - Commit: 1. ab8b8ae8177cb42d7acbe001ff6ae734b90e50f3 , 2. 61f5efb68fcb85e4ce34e4f996ad78fafd0739cf
 
@@ -24,6 +26,8 @@
 - Što je AI napravio dobro: Relativno dobro je pohavato osnovnu ideju pametnog ugovora.
 - Što je AI napravio drugačije nego što sam očekivao: Išao je komplicirati bez potrebe.
 - Što sam dodao u AGENTS.md: ništa od zadnji puta
+- Model: GPT 6.1 Sol high
+- Commit: 1. 06766fe471af6c2edb6638d9e246b9adde7f93cc , 2. 96837748cf70484ad8926e88a07eb3a4379f0e83
 - 
 | ID | Vrsta | Točan odjeljak | Nalaz | Predloženi kriterij prihvaćanja |
 | --- | --- | --- | --- | --- |
@@ -38,11 +42,21 @@
 | N9 | Nedovoljno određen kriterij provjere | **Kriteriji prihvaćanja → K28** | K28 tvrdi da ključ nije pohranjen ili zabilježen, ali ne određuje koje se pohrane, dnevnici i izlazi pregledavaju. Bez definiranog opsega provjere nije jasno što predstavlja dokaz prolaska, osobito kod grešaka i posredničkog HTTP zapisivanja. | **Zadano:** test koristi prepoznatljiv probni API ključ i odvojeno simulira uspjeh, provider grešku i grešku baze. **Kada:** svaki zahtjev završi. **Tada:** ključ se ne pojavljuje u MongoDB-u, preglednikovoj pohrani, aplikacijskim/proxy logovima ni javnim odgovorima; novi zahtjev bez ključa vraća `"API kljuc je obavezan"`. |
 | N10 | Nepokrivena granica ulaza | **Odluke o modulu → AI servisi, izvori i ulazna ograničenja**; **K21, K23** | „Unicode znak” nije dovoljno precizna jedinica. Broj Unicode kodnih točaka, UTF-16 jedinica i vizualnih znakova može se razlikovati. Različite implementacije zato mogu različito prihvaćati iste promptove na granici. | **Zadano:** duljina se definira brojem Unicode kodnih točaka, a testni AI adapter prihvaća zahtjev. **Kada:** korisnik pošalje prompt od 10.000 znakova izvan osnovne Unicode ravnine, zatim od 10.001 takvog znaka. **Tada:** prvi prolazi provjeru duljine, a drugi vraća HTTP 400 i `"Prompt je predug"`. |
 | N11 | Nepokriven slučaj razvojnog okruženja | **Opis → Blockchain**; **Potpisana potvrda ProofNewsa**; **K39, K59** | Nije obrađen reset Remix VM-a nakon kojeg se mogu ponoviti chainId, adresa ugovora, potpisnik i njegova verzija. Ako su svi potpisani podaci ponovno isti, stara potvrda nema oznaku koja razlikuje dvije instance deploymenta. EIP-712 razlikuje samo uključena polja domene. ([EIP-712](https://eips.ethereum.org/EIPS/eip-712#definition-of-domainseparator)) | **Zadano:** sačuvana je potvrda prije reseta VM-a, a novi deployment ponavlja chainId i adresu registra. **Kada:** korisnik pokuša staru potvrdu na novoj instanci. **Tada:** registracija pada s `"Nevaljana potvrda ProofNewsa"`. Specifikacija treba odrediti razlikovanje instanci, primjerice jedinstvenom domenom ili obveznim novim potpisnikom. |
-- Commit: 1. 96837748cf70484ad8926e88a07eb3a4379f0e83
 
-## T3 sucelje i sljedivost
+## T3: Ispravak pronađenih problema spec-a
+- Cilj termina: Ispraviti problematike koje je pronašao kritičar
+- Najkorisniji prompt (kopiran u cijelosti): Sada na kraju SPEC-a dodaj dio u kojem adresiraš pronađene probleme te minimalni kirurški fix kojim se oni rješavaju unutar SPEC-a.
+- Što je AI napravio dobro: Dobro je svatio da želim minimalne kirurške izmjene umjesto velikih pormjena / opesga
+- Što je AI napravio drugačije nego što sam očekivao: ništa
+- Model: GPT 6.1 Terra xhigh ultrafast
+- Što sam dodao u AGENTS.md: ništa od zadnji puta
+- Commit: 
+ 
+## T3: sucelje i sljedivost
 - Cilj termina: Napraviti osnovnu specifikaciju aplikacije
 - Najkorisniji prompt (kopiran u cijelosti): Promptovi sa 3. Vježbe ( svi )
 - Što je AI napravio dobro: Relativno dobro je pohavato osnovnu ideju pametnog ugovora.
 - Što je AI napravio drugačije nego što sam očekivao: Išao je komplicirati bez potrebe.
 - Što sam dodao u AGENTS.md: ništa od zadnji puta
+- Model: GPT 6.1 Sol High
+- Commit: 
