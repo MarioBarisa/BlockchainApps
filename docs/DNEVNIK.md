@@ -50,13 +50,13 @@
 - Što je AI napravio drugačije nego što sam očekivao: ništa
 - Model: GPT 6.1 Terra xhigh ultrafast
 - Što sam dodao u AGENTS.md: ništa od zadnji puta
-- Commit: 
+- Commit: 1. 39b03d130eee303e78289973428b7cc050e9dec4
  
 ## T3: sucelje i sljedivost
-- Cilj termina: Napraviti osnovnu specifikaciju aplikacije
+- Cilj termina: Napraviti osnovni blockchian backbone
 - Najkorisniji prompt (kopiran u cijelosti): Promptovi sa 3. Vježbe ( svi )
 - Što je AI napravio dobro: Relativno dobro je pohavato osnovnu ideju pametnog ugovora.
-- Što je AI napravio drugačije nego što sam očekivao: Išao je komplicirati bez potrebe.
-- Što sam dodao u AGENTS.md: ništa od zadnji puta
+- Što je AI napravio drugačije nego što sam očekivao: ništa
+- Što sam dodao u AGENTS.md: 'Ne diraj git osim ako te ja to ne pitam.'
 - Model: GPT 6.1 Sol High
 - Commit: 

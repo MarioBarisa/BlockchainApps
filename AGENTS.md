@@ -21,6 +21,7 @@
 - Poruke u require piši bez dijakritike.
 - Nikad ne traži, ne ispisuj i ne spremaj privatne ključeve.
 - Na kraju ukratko objasni što si promijenio i zašto.
+- Ne diraj git osim ako te ja to ne pitam.
 - Dodao student:
   - Write code optimized for a junior developer to understand. Prefer linear & procedural
   - Keep the codebase simple and maintainable. Avoid unnecessary complexity.
