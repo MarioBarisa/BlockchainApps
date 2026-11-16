@@ -90,6 +90,8 @@ Zaključak: sva tri dostavljena rezultata odgovaraju očekivanim ishodima iz spe
 
 ## E4: Hardhat projekt , E4: testovi tokena, E4: Skripta za objavu
 
+Hardhat datoteke su u `hardhat/`, pa prije pokretanja naredbi napravim `cd hardhat`.
+
 ### Vježba 4: testovi
 - Prompt: Iz priloženog PDF-a potrebno je napraviti 2. dio zadatka vezanog uz testiranje. Pročitaj originalni prompt te napravi potrebne stvari s več unaprijed definiranim specsovima i konvencijama.
 - Testova: 18, prolazi: 18

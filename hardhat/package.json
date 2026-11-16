@@ -12,7 +12,7 @@
     "test:mutation": "node scripts/mutation.js",
     "node": "node scripts/local-node.js",
     "deploy:local": "hardhat run scripts/deploy.js --network localhost",
-    "lint": "node frontend/node_modules/eslint/bin/eslint.js --config eslint.hardhat.config.js hardhat.config.js eslint.hardhat.config.js test scripts"
+    "lint": "node ../frontend/node_modules/eslint/bin/eslint.js --config eslint.hardhat.config.js hardhat.config.js eslint.hardhat.config.js test scripts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "4.0.0",
