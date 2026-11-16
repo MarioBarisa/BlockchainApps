@@ -497,7 +497,36 @@ Poslovna i tehnička pravila za opisani tok definirana su. RPC URL-ovi, stvarne 
 
 ## Sljedivost
 
-Formalna tablica Funkcija | Kriteriji i provjera oba smjera popunjavaju se u Dijelu 4 nakon izrade sučelja, prema redoslijedu vježbe. Oznake K1–K72 pripremljene su za taj korak; K60–K72 nalaze se u završnoj obradi recenzije. Kriteriji AI poziva, kompresije i API-ja mapiraju se na aplikacijske funkcije, ne na sposobnosti koje Solidity ugovor samostalno izvršava.
+### Vježba 4: token
+
+Testovi su u `test/ProofNewsToken.test.js`. Svaki red ima jedan zaseban `it()` s navedenim točnim nazivom. `beforeEach` objavljuje novi token i pomoćni `RegistryMock`; nijedan test ne koristi stanje prethodnog testa. Postojeća implementacija tokena nije promijenjena.
+
+| Funkcija | Kriterij | Test |
+| --- | --- | --- |
+| constructor, name, symbol, decimals, totalSupply, owner, registry | K1 | K1: objava postavlja metapodatke, vlasnika i nultu ponudu |
+| setRegistry | K2 | K2: vlasnik jednom povezuje registar uz RegistrySet |
+| setRegistry | K3 | K3: nevlasnik ne moze povezati registar |
+| setRegistry | K4 | K4: postavljeni registar ne moze se zamijeniti |
+| setRegistry | K5 | K5: nulta adresa i adresa bez koda nisu registar |
+| mintProof | K6 | K6: samo povezani registar moze izdati token |
+| mintProof, balanceOf, totalSupply, Transfer | K7, tokenov dio | K7: poziv registra izdaje tocno jedan PNP uz Transfer |
+| mintProof | K8 | K8: registar ne moze izdati token nultoj adresi |
+| mintProof, totalSupply | K9 | K9: ponuda na uint256 granici odbija mint bez promjene stanja |
+| transfer, transferFrom | K10 | K10: transfer i transferFrom uvijek padaju i cuvaju salda |
+| approve, allowance, Approval | K11 | K11: approve uvijek pada bez allowance i Approval dogadjaja |
+| totalSupply, balanceOf, allowance; odsutnost burn/burnFrom | K12 | K12: javna citanja ne mijenjaju stanje i nema javnog spaljivanja |
+| transferOwnership | K13, tokenov dio | K13: nevlasnik ne moze prenijeti vlasnistvo tokena |
+| transferOwnership, setRegistry | K14, tokenov dio | K14: novi vlasnik preuzima ovlasti a stari ih gubi |
+| transferOwnership | K15, tokenov dio | K15: vlasnistvo se ne moze prenijeti nultoj adresi |
+| renounceOwnership | K16, tokenov dio | K16: nitko se ne moze odreci vlasnistva |
+| setRegistry, provjera token() | K60 | K60: neispravan token getter ili drugi token ne mogu povezati registar |
+| transferOwnership, setRegistry | K61, tokenov dio | K61: prijenos vlasnistva sebi emitira dogadjaj i zadrzava ovlasti |
+
+**Granica ove provjere:** `RegistryMock` samo omogućuje poziv tokena s ugovorne adrese; nije implementacija `ProofNewsRegistry` i ne provjerava EIP-712 potvrde. K7 ovdje dokazuje izdavanje jedne jedinice na poziv registra, a ne cijelu uspješnu registraciju. Dijelovi K13–K16 i K61 koji se odnose na registar, uključujući neovisnost vlasništva para iz K14, zahtijevaju njegovu buduću implementaciju i integracijske testove. K37 i K44 jesu kriteriji registra: pogrešna povezanost i poništenje upisa dokaza nakon pada minta ovdje nisu testirani. K6, K8 i K9 provjeravaju tokenove razloge odbijanja, ali nisu zamjena za dokaz atomarnosti registracije. Testni ugovori ne objavljuju se skriptom `scripts/deploy.js` niti se koriste za produkcijsko povezivanje.
+
+K9 priprema tehničku granicu pomoću `hardhat_setStorageAt` samo na testnoj mreži. Slot `_totalSupply` čita se iz kompajlerova `storageLayout`, bez promjene ugovora i bez pretpostavke fiksnog broja slota. K60 pokriva nedostajući/padajući getter, prazan, prekratak i predug povrat, neispravno ABI kodiranu adresu te getter drugog tokena.
+
+Kriteriji AI poziva, kompresije, API-ja i ostatka registra ostaju izvan ove vježbe tokena. Tablica nije tvrdnja da su svi kriteriji K1–K72 već implementirani.
 
 ## Obrada nalaza recenzije i minimalne dopune
 

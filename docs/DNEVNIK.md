@@ -87,3 +87,24 @@ Ugovor: ProofNewsToken, adresa `0xa131AD247055FD2e2aA8b156A11bdEc81b9eAD95`.
 Transakcija K14: `0x776d3a7328c6673ee0b950f823e3a7fa5f6c841c7b378312bd0949c8f4569bb9`; blok 3; trošak transakcije 29.051 gas.
 
 Zaključak: sva tri dostavljena rezultata odgovaraju očekivanim ishodima iz specifikacije. U dostavljenim izlazima nisu utvrđena odstupanja koja zahtijevaju ispravak koda ili SPEC-a. K10 zabilježen je kao call, a ne kao nova transakcija. Nakon K14 vlasnička adresa je račun B.
+
+## E4: Hardhat projekt , E4: testovi tokena, E4: Skripta za objavu
+
+### Vježba 4: testovi
+- Prompt: Iz priloženog PDF-a potrebno je napraviti 2. dio zadatka vezanog uz testiranje. Pročitaj originalni prompt te napravi potrebne stvari s več unaprijed definiranim specsovima i konvencijama.
+- Testova: 18, prolazi: 18
+- Greška AI-ja koju sam uočio: Iz nekog razloga AI je uporno htio koristi Node v20 iako mu to u orignalnom PDF-u, specsu i svugdej drugdje piše da ne radi.
+- Mutacijska provjera: 
+
+## Vježba 4: objava na lokalnoj mreži
+-   ```markdown Contract deployment: ProofNewsToken
+                  Contract address:    0x0165878a594ca255338adfa4d48449f69242eb8f
+                  Transaction:         0x68df0f0be6e126857b32fb151cc7c4a95d54b207bc440104dfe4d641a87fa009
+                  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+                  Value:               0 ETH
+                  Gas used:            1433533 of 1433533
+                  Block #7:            0x6e2f8fe441c8b4fb17bf1a4c1d1bf8da14a8ebd6e87189c75fcfc602b2cad722 
+    ```
+- Zašto objava troši gas, a čitanje salda ne? Objava sprema ugovor na blockchain, a čitanje salda samo dohvaća podatke i ne mijenja stanje.
+- Zašto je druga transakcija (postaviAdministratora) potrošila puno manje gasa od objave? Jer mijenja samo postojeće podatke, dok se kod objave sprema cijeli kod ugovora.
+- Što bi se dogodilo s ugovorom da sad ugasim npx hardhat node? Lokalno stanje bi se izgubilo i nakon ponovnog pokretanja morao bih opet objaviti ugovor.
