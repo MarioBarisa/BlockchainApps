@@ -5,7 +5,12 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "dark";
+  name: "garden";
+  default: true;
+}
+
+@plugin "daisyui/theme" {
+  name: "forest";
   prefersdark: true;
 }
 

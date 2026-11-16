@@ -34,15 +34,8 @@ watch(() => route.fullPath, () => {
 
 <template>
   <details ref="dropdown" class="dropdown dropdown-end" @keydown.esc.prevent="closeMenu()">
-    <summary ref="trigger" class="header-menu-trigger btn btn-outline btn-sm gap-2 border-base-300 bg-base-100 text-xs" :aria-label="`Tema sučelja: ${theme.preference === 'system' ? 'Automatski · ' : ''}${theme.mode}`">
-      <AppIcon name="palette" :size="16" />
-      <span class="hidden w-20 truncate text-left lg:inline">{{ theme.preference === 'system' ? 'Automatski' : theme.mode }}</span>
-      <span :data-theme="theme.mode" class="hidden gap-0.5 rounded border border-base-300 bg-base-100 p-1 sm:flex" aria-hidden="true">
-        <span class="size-2.5 rounded-xs bg-primary"></span>
-        <span class="size-2.5 rounded-xs bg-secondary"></span>
-        <span class="size-2.5 rounded-xs bg-accent"></span>
-      </span>
-      <AppIcon name="caret-down" :size="12" class="hidden sm:block" />
+    <summary ref="trigger" class="header-menu-trigger btn btn-square btn-outline btn-sm rounded-md border-base-300 bg-base-100" title="Odaberi temu" :aria-label="`Tema sučelja: ${theme.preference === 'system' ? 'Automatski · ' : ''}${theme.mode}`">
+      <AppIcon name="palette" :size="16" aria-hidden="true" />
     </summary>
     <div class="dropdown-content header-menu z-50 mt-2 w-64 overflow-hidden rounded-lg border border-base-300 bg-base-100 shadow-lg">
       <p class="border-b border-base-300 bg-base-200/60 px-3 py-2 text-xs font-semibold">Tema sučelja <span class="ml-1 font-mono text-base-content/70">{{ theme.themes.length }}</span></p>

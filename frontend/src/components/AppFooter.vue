@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { appConfig } from '@/config/app'
+import { useWalletStore } from '@/stores/wallet'
 import AppIcon from '@/components/AppIcon.vue'
+const wallet = useWalletStore()
 </script>
 
 <template>
@@ -17,7 +19,7 @@ import AppIcon from '@/components/AppIcon.vue'
         </span>
       </div>
       <p class="text-xs">
-        Demo sučelje · mreža {{ appConfig.network.name }} · podaci na stranici su primjeri
+        Mreža {{ wallet.network.name }} · projekti su primjeri, wallet podaci čitaju se s mreže
       </p>
     </div>
   </footer>

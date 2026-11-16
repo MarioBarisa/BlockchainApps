@@ -12,6 +12,7 @@
     "test:mutation": "node scripts/mutation.js",
     "node": "node scripts/local-node.js",
     "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "fund:local": "node scripts/fund.js",
     "lint": "node ../frontend/node_modules/eslint/bin/eslint.js --config eslint.hardhat.config.js hardhat.config.js eslint.hardhat.config.js test scripts"
   },
   "devDependencies": {

@@ -29,3 +29,7 @@ npm run lint
 ```
 
 Za lokalnu objavu u jednom terminalu, iz ove mape, pokreni `npm run node`, a u drugom `npm run deploy:local`. Čvor koristi `127.0.0.1:8545`, chainId 31337 i filtrira ispis privatnih ključeva. Skripta objavljuje samo token; testni registar nije produkcijski registar.
+
+Objava automatski sprema ABI, adresu, kod i podatke receipta u `frontend/public/deployments/localhost.json`, koji frontend koristi za čitanje tokena. Datoteka je isključena iz Gita. Za dodavanje lokalnog ETH-a javnoj adresi koristi `RECIPIENT=0xJAVNA_ADRESA npm run fund:local -- 2.5`; iznos je pozitivan broj s decimalnom točkom i najviše 18 decimala. Bez argumenta šalje se 1 ETH. Privatni ključ nije potreban.
+
+Testiranje kroz sučelje: [upute za frontend](../frontend/HARDHAT_TESTIRANJE.md).

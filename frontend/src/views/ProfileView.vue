@@ -1,21 +1,32 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import QrcodeVue from 'qrcode.vue'
-import { explorerUrl, useWalletStore } from '@/stores/wallet'
+import { useWalletStore } from '@/stores/wallet'
 import AppIcon from '@/components/AppIcon.vue'
+import NetworkSelector from '@/components/NetworkSelector.vue'
+import ProofNewsToken from '@/components/ProofNewsToken.vue'
+import CopyAddress from '@/components/CopyAddress.vue'
 import { type WalletTransaction } from '@/services/walletHistory'
 
 const wallet = useWalletStore()
+const explorerUrl = computed(() => wallet.network.explorerUrl)
 const recipient = ref('')
 const amount = ref('')
 const copyMessage = ref('')
 const submitted = ref(false)
 const qrDialog = ref<HTMLDialogElement | null>(null)
-const ready = computed(() => wallet.connected && wallet.isSepolia && !wallet.connecting && !wallet.sending)
+const errorSummary = ref<HTMLDivElement | null>(null)
+const ready = computed(() => wallet.connected && wallet.isCorrectNetwork && !wallet.connecting && !wallet.sending && !wallet.authorizationRequired)
 const dateTime = (value: number | null) => value === null ? '—' : new Intl.DateTimeFormat('hr-HR', { dateStyle: 'short', timeStyle: 'short' }).format(value)
 const statusLabels = { pending: 'Čeka potvrdu', confirmed: 'Potvrđeno', failed: 'Neuspjelo' }
 
-watch(() => wallet.address, () => {
+watch(() => wallet.error, async (message) => {
+  if (!message) return
+  await nextTick()
+  errorSummary.value?.focus()
+})
+
+watch(() => [wallet.address, wallet.chainId, wallet.networkKey], () => {
   qrDialog.value?.close()
   recipient.value = ''
   amount.value = ''
@@ -59,18 +70,25 @@ async function submit() {
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
         <p class="text-xs font-bold uppercase tracking-wide text-primary">Moj wallet</p>
-        <h1 class="mt-1 text-xl font-semibold">Sepolia ETH na jednom mjestu</h1>
+        <h1 class="mt-1 text-xl font-semibold">{{ wallet.network.currencyLabel }} na jednom mjestu</h1>
         <p class="mt-2 text-sm text-base-content/70">Pregled salda, slanje i primanje na Ethereum testnoj mreži.</p>
       </div>
       <span class="badge badge-outline gap-2 font-mono text-[11px]">
-        <span class="size-2 rounded-full" :class="wallet.isSepolia ? 'bg-success' : 'bg-warning'"></span>
-        {{ wallet.connected ? (wallet.isSepolia ? 'Sepolia' : 'Druga mreža') : 'Sepolia · nije spojeno' }}
+        <span class="size-2 rounded-full" :class="wallet.isCorrectNetwork ? 'bg-success' : 'bg-warning'"></span>
+        {{ wallet.connected ? wallet.actualNetworkName : `${wallet.network.name} · nije spojeno` }}
       </span>
     </div>
-    <div v-if="wallet.error || wallet.refreshError" role="alert" class="alert alert-error mt-6 text-sm">{{ wallet.error || wallet.refreshError }}</div>
-    <div v-if="wallet.connected && !wallet.isSepolia" class="alert alert-warning mt-4 flex flex-wrap justify-between text-sm">
-      <span>Odaberi Sepoliju za prikaz salda i slanje testnog ETH-a.</span>
-      <button type="button" class="btn btn-sm" :disabled="wallet.connecting || wallet.sending" @click="wallet.switchNetwork()">Prebaci na Sepoliju</button>
+    <NetworkSelector />
+    <ProofNewsToken />
+    <div v-if="wallet.error || wallet.refreshError" ref="errorSummary" role="alert" tabindex="-1" class="alert alert-error mt-6 text-sm">
+      <p>{{ wallet.error || wallet.refreshError }}</p>
+      <button v-if="wallet.authorizationRequired" type="button" class="btn btn-sm min-h-12" :disabled="wallet.connecting || wallet.sending" @click="wallet.reauthorize()">
+        {{ wallet.connecting ? 'Potvrdi u MetaMasku…' : 'Ponovno odobri wallet' }}
+      </button>
+    </div>
+    <div v-if="wallet.connected && !wallet.isCorrectNetwork" class="alert alert-warning mt-4 flex flex-wrap justify-between text-sm">
+      <span>Odaberi {{ wallet.network.name }} za prikaz salda i slanje testnog ETH-a.</span>
+      <button type="button" class="btn btn-sm" :disabled="wallet.connecting || wallet.sending" @click="wallet.switchNetwork()">Prebaci na {{ wallet.network.name }}</button>
     </div>
 
     <div class="mt-4 grid items-start gap-4 lg:grid-cols-2">
@@ -85,17 +103,17 @@ async function submit() {
           <template v-if="wallet.connected">
             <div class="rounded-md border border-base-300 bg-base-200/60 px-4 py-3">
               <p class="break-all font-mono text-xl font-semibold tabular-nums sm:text-2xl">{{ wallet.balance }}</p>
-              <p class="mt-1 text-xs font-semibold text-primary">Sepolia ETH</p>
+              <p class="mt-1 text-xs font-semibold text-primary">{{ wallet.network.currencyLabel }}</p>
               <p class="mt-2 text-xs text-base-content/70">{{ wallet.updatedAt ? `Osvježeno ${dateTime(wallet.updatedAt)}` : 'Saldo trenutačno nije dostupan.' }}</p>
             </div>
             <div class="mt-4">
-              <h3 class="text-sm font-bold">Primi Sepolia ETH</h3>
-              <p class="mt-1 text-sm text-base-content/70">Podijeli ovu adresu s pošiljateljem i odaberite mrežu Sepolia.</p>
+              <h3 class="text-sm font-bold">Primi {{ wallet.network.currencyLabel }}</h3>
+              <p class="mt-1 text-sm text-base-content/70">Podijeli ovu adresu s pošiljateljem i odaberite mrežu {{ wallet.network.name }}.</p>
               <p class="mt-2 select-all break-all rounded-md border border-base-300 bg-base-200/50 p-2.5 font-mono text-xs">{{ wallet.address }}</p>
               <div class="wallet-actions mt-3 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
                 <button type="button" class="btn btn-outline btn-sm gap-2 rounded-md" @click="copyAddress()"><AppIcon name="copy" :size="16" />Kopiraj adresu</button>
                 <button type="button" class="btn btn-outline btn-sm gap-2 rounded-md" aria-haspopup="dialog" aria-controls="wallet-address-qr" @click="qrDialog?.showModal()"><AppIcon name="qr-code" :size="16" />Prikaži QR kod</button>
-                <a :href="`${explorerUrl}/address/${wallet.address}`" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm gap-2 rounded-md sm:w-auto">Povijest na exploreru <AppIcon name="arrow-up-right" :size="16" /></a>
+                <a v-if="explorerUrl" :href="`${explorerUrl}/address/${wallet.address}`" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm gap-2 rounded-md sm:w-auto">Povijest na exploreru <AppIcon name="arrow-up-right" :size="16" /></a>
               </div>
               <p v-if="copyMessage" role="status" class="mt-2 text-xs">{{ copyMessage }}</p>
             </div>
@@ -114,21 +132,21 @@ async function submit() {
 
       <section class="app-panel">
         <div class="panel-heading">
-          <h2 class="flex items-center gap-2 font-semibold"><AppIcon name="arrow-up-right" :size="18" /> Pošalji Sepolia ETH</h2>
+          <h2 class="flex items-center gap-2 font-semibold"><AppIcon name="arrow-up-right" :size="18" /> Pošalji {{ wallet.network.currencyLabel }}</h2>
         </div>
         <div class="panel-body">
           <p class="mt-2 text-sm text-base-content/70">Unesi primatelja i iznos. Wallet će prikazati mrežnu naknadu prije potvrde.</p>
-          <form class="mt-4 space-y-3" @submit.prevent="submit()">
+          <form class="mt-4 space-y-3" aria-label="Slanje testnog ETH-a" @submit.prevent="submit()">
             <div>
               <label for="recipient" class="field-label">Adresa primatelja</label>
-              <input id="recipient" v-model="recipient" type="text" autocomplete="off" spellcheck="false" placeholder="0x…" class="input input-sm w-full rounded-md font-mono" :disabled="!ready" required />
+              <input id="recipient" v-model="recipient" name="recipient" autocapitalize="none" autocorrect="off" type="text" autocomplete="off" spellcheck="false" placeholder="0x…" class="input input-sm w-full rounded-md font-mono" :disabled="!ready" required />
             </div>
             <div>
-              <label for="amount" class="field-label">Iznos u Sepolia ETH</label>
-              <input id="amount" v-model="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.01" class="input input-sm w-full rounded-md" :disabled="!ready" required aria-describedby="amount-hint" />
+              <label for="amount" class="field-label">Iznos u {{ wallet.network.currencyLabel }}</label>
+              <input id="amount" v-model="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.01" class="input input-sm w-full rounded-md" :disabled="!ready" required aria-describedby="amount-hint" />
               <p id="amount-hint" class="mt-2 text-xs text-base-content/70">Koristi decimalnu točku. Ostavi dio salda za mrežnu naknadu.</p>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm w-full rounded-md" :disabled="!ready || !recipient.trim() || !amount.trim()">
+            <button type="submit" class="btn btn-primary btn-sm w-full rounded-md" :disabled="!ready">
               <span v-if="wallet.sending" class="loading loading-spinner loading-xs"></span>
               {{ wallet.sending ? 'Potvrdi slanje u walletu…' : 'Nastavi u walletu' }}
             </button>
@@ -145,18 +163,19 @@ async function submit() {
           <h2>Povijest transakcija</h2>
           <span class="badge badge-ghost badge-sm font-mono">{{ wallet.activity.length }} {{ wallet.hasMoreHistory ? 'učitano' : 'zapisa' }}</span>
         </div>
-        <button type="button" class="btn btn-ghost btn-sm w-full sm:w-auto" :disabled="!wallet.connected || !wallet.isSepolia || wallet.historyLoading" @click="wallet.loadHistory()">
+        <button type="button" class="btn btn-ghost btn-sm w-full sm:w-auto" :disabled="!wallet.connected || !wallet.isCorrectNetwork || wallet.historyLoading || wallet.refreshing" @click="wallet.loadHistory()">
           <span v-if="wallet.historyLoading" class="loading loading-spinner loading-xs"></span>
           {{ wallet.historyLoading ? 'Učitavam…' : 'Osvježi povijest' }}
         </button>
       </div>
       <div class="border-b border-base-300 px-4 py-3 text-xs text-base-content/70">
-        <p>Ulazne i izlazne Sepolia transakcije te interni ETH prijenosi preko ugovora. Najnoviji zapisi su prvi; stariji su dostupni ispod popisa.</p>
-        <p class="mt-1">Izvor: <a href="https://eth-sepolia.blockscout.com" target="_blank" rel="noopener noreferrer" class="link">Blockscout</a><span v-if="wallet.historyUpdatedAt"> · Osvježeno {{ dateTime(wallet.historyUpdatedAt) }}</span> · Novi zapisi mogu se pojaviti s odmakom.</p>
+        <p v-if="wallet.networkKey === 'sepolia'">Ulazne i izlazne Sepolia transakcije te interni ETH prijenosi preko ugovora. Najnoviji zapisi su prvi; stariji su dostupni ispod popisa.</p>
+        <p v-else>Ulazne i izlazne transakcije za ovu adresu iz cijelog lokalnog lanca, uključujući uplate preko fund:local i slanja izvan aplikacije.</p>
+        <p v-if="wallet.networkKey === 'sepolia'" class="mt-1">Izvor: <a href="https://eth-sepolia.blockscout.com" target="_blank" rel="noopener noreferrer" class="link">Blockscout</a><span v-if="wallet.historyUpdatedAt"> · Osvježeno {{ dateTime(wallet.historyUpdatedAt) }}</span> · Novi zapisi mogu se pojaviti s odmakom.</p>
       </div>
       <div v-if="wallet.historyError" role="alert" class="m-3 rounded-md border border-warning/40 bg-warning/10 p-3 text-xs">
         {{ wallet.historyError }}
-        <a v-if="wallet.address" :href="`${explorerUrl}/address/${wallet.address}`" target="_blank" rel="noopener noreferrer" class="link ml-1">Otvori Etherscan</a>
+        <a v-if="wallet.address && explorerUrl" :href="`${explorerUrl}/address/${wallet.address}`" target="_blank" rel="noopener noreferrer" class="link ml-1">Otvori Etherscan</a>
       </div>
       <div v-if="wallet.historyLoading && !wallet.activity.length" role="status" class="flex items-center gap-2 px-4 py-6 text-sm text-base-content/70">
         <span class="loading loading-spinner loading-sm"></span>Učitavam povijest walleta…
@@ -164,7 +183,7 @@ async function submit() {
       <div v-else-if="!wallet.activity.length" class="flex items-center gap-3 px-4 py-6">
         <span class="grid size-10 shrink-0 place-items-center rounded-md border border-base-300 bg-base-200 text-base-content/60"><AppIcon name="hand-coins" :size="22" /></span>
         <div>
-          <p class="text-sm font-semibold">{{ !wallet.connected ? 'Poveži wallet za prikaz povijesti' : !wallet.isSepolia ? 'Odaberi mrežu Sepolia' : wallet.historyError ? 'Povijest nije dostupna' : wallet.historyLoaded ? 'Nema transakcija za ovu adresu' : 'Povijest još nije učitana' }}</p>
+          <p class="text-sm font-semibold">{{ !wallet.connected ? 'Poveži wallet za prikaz povijesti' : !wallet.isCorrectNetwork ? `Odaberi mrežu ${wallet.network.name}` : wallet.historyError ? 'Povijest nije dostupna' : wallet.historyLoaded ? 'Nema transakcija za ovu adresu' : 'Povijest još nije učitana' }}</p>
           <p class="mt-1 text-xs text-base-content/70">Prikazuju se zapisi za povezanu adresu, uključujući transakcije izvan ove aplikacije.</p>
         </div>
       </div>
@@ -191,7 +210,7 @@ async function submit() {
             </div>
             <div class="tx-address min-w-0">
               <p class="data-label mb-1 lg:sr-only">{{ isOutgoing(tx) ? 'Primatelj' : 'Pošiljatelj' }}</p>
-              <a v-if="counterparty(tx)" :href="`${explorerUrl}/address/${counterparty(tx)}`" :title="counterparty(tx) ?? undefined" target="_blank" rel="noopener noreferrer" class="transaction-link link link-hover block break-all font-mono text-xs text-primary lg:truncate">{{ counterparty(tx) }}</a>
+              <CopyAddress v-if="counterparty(tx)" :address="counterparty(tx) ?? ''" :href="explorerUrl ? `${explorerUrl}/address/${counterparty(tx)}` : undefined" :label="isOutgoing(tx) ? 'primatelja' : 'pošiljatelja'" />
               <span v-else class="text-xs text-base-content/70">Kreiranje ugovora</span>
             </div>
             <div class="tx-status">
@@ -211,10 +230,11 @@ async function submit() {
             </div>
             <div class="tx-reference min-w-0">
               <p class="data-label mb-1 lg:sr-only">Transakcija</p>
-              <a :href="`${explorerUrl}/tx/${tx.hash}`" :title="tx.hash" target="_blank" rel="noopener noreferrer" class="transaction-link inline-flex max-w-full items-center gap-1 font-mono text-xs text-primary hover:underline">
+              <a v-if="explorerUrl" :href="`${explorerUrl}/tx/${tx.hash}`" :title="tx.hash" target="_blank" rel="noopener noreferrer" class="transaction-link inline-flex max-w-full items-center gap-1 font-mono text-xs text-primary hover:underline">
                 <span class="truncate">{{ tx.hash.slice(0, 8) }}…{{ tx.hash.slice(-6) }}</span><AppIcon name="arrow-up-right" :size="14" class="shrink-0" />
                 <span class="sr-only">Detalji transakcije na Etherscanu</span>
               </a>
+              <span v-else class="block break-all font-mono text-xs" :title="tx.hash">{{ tx.hash }}</span>
             </div>
           </li>
         </ul>
@@ -226,15 +246,15 @@ async function submit() {
         </button>
       </div>
     </section>
-    <p class="mt-4 flex items-start gap-2 text-xs text-base-content/70"><AppIcon name="info" :size="18" class="shrink-0" />Sepolia je testna mreža. Koristi samo testni ETH. Naknadu transakcije plaća pošiljatelj; iznos neuspjele transakcije nije prenesen. ERC-20 prijenosi dostupni su na exploreru.</p>
+    <p class="mt-4 flex items-start gap-2 text-xs text-base-content/70"><AppIcon name="info" :size="18" class="shrink-0" />Koristi samo testni ETH na odabranoj mreži. Naknadu transakcije plaća pošiljatelj; iznos neuspjele transakcije nije prenesen.</p>
 
     <dialog id="wallet-address-qr" ref="qrDialog" class="modal" aria-labelledby="wallet-qr-title" aria-describedby="wallet-qr-description">
       <div class="wallet-qr-box modal-box max-w-sm rounded-lg border border-base-300 p-5 text-center">
-        <h2 id="wallet-qr-title" class="text-lg font-semibold">Primi Sepolia ETH</h2>
-        <span class="badge badge-outline mt-3">Sepolia · testna mreža</span>
-        <p id="wallet-qr-description" class="mt-4 text-sm text-base-content/70">Skeniraj adresu walletom pošiljatelja i odaberi mrežu Sepolia.</p>
+        <h2 id="wallet-qr-title" class="text-lg font-semibold">Primi {{ wallet.network.currencyLabel }}</h2>
+        <span class="badge badge-outline mt-3">{{ wallet.network.name }} · testna mreža</span>
+        <p id="wallet-qr-description" class="mt-4 text-sm text-base-content/70">Skeniraj adresu walletom pošiljatelja i odaberi mrežu {{ wallet.network.name }}.</p>
         <div v-if="wallet.address" class="mx-auto mt-5 w-fit max-w-full rounded-md bg-white p-3">
-          <QrcodeVue :value="wallet.address" :size="224" :margin="4" level="M" render-as="svg" background="#ffffff" foreground="#000000" class="h-auto max-w-full" role="img" aria-label="QR kod adrese za primanje Sepolia ETH-a" />
+          <QrcodeVue :value="wallet.address" :size="224" :margin="4" level="M" render-as="svg" background="#ffffff" foreground="#000000" class="h-auto max-w-full" role="img" :aria-label="`QR kod adrese za primanje na mreži ${wallet.network.name}`" />
         </div>
         <p class="mt-4 select-all break-all rounded-md bg-base-200 p-3 font-mono text-xs">{{ wallet.address }}</p>
         <button type="button" class="btn btn-outline btn-sm mt-4 gap-2 rounded-md" @click="copyAddress()"><AppIcon name="copy" :size="16" />Kopiraj adresu</button>

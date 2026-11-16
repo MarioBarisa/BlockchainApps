@@ -44,7 +44,7 @@ watch(() => route.fullPath, () => {
 
   <details v-else ref="dropdown" class="dropdown dropdown-end" @keydown.esc.prevent="closeMenu()">
     <summary ref="trigger" class="header-menu-trigger btn btn-outline btn-sm gap-2 rounded-md border-base-300" :aria-label="`Wallet: ${wallet.address}`">
-      <span class="size-2 rounded-full" :class="wallet.isSepolia ? 'bg-success' : 'bg-warning'"></span>
+      <span class="size-2 rounded-full" :class="wallet.isCorrectNetwork ? 'bg-success' : 'bg-warning'"></span>
       <span class="font-mono text-xs sm:hidden">{{ wallet.address?.slice(0, 4) }}…{{ wallet.address?.slice(-4) }}</span>
       <span class="hidden font-mono text-xs sm:inline">{{ wallet.shortAddress }}</span>
       <AppIcon name="caret-down" :size="14" />
@@ -54,7 +54,7 @@ watch(() => route.fullPath, () => {
     >
       <li class="flex items-center justify-between text-sm">
         <span class="text-base-content/70">Mreža</span>
-        <span class="font-semibold">{{ wallet.isSepolia ? 'Sepolia' : 'Druga mreža' }}</span>
+        <span class="font-semibold">{{ wallet.actualNetworkName }}</span>
       </li>
       <li class="flex items-center justify-between text-sm">
         <span class="text-base-content/70">Saldo</span>

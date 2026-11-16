@@ -20,7 +20,7 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   const preference = ref(readPreference())
-  const systemTheme = computed(() => systemDark.value ? 'dark' : 'light')
+  const systemTheme = computed(() => systemDark.value ? 'forest' : 'garden')
   const mode = computed(() => preference.value === 'system' ? systemTheme.value : preference.value)
 
   function applyTheme() {

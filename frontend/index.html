@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="hr" data-theme="light">
+<html lang="hr" data-theme="garden">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="description" content="Predložak web3 aplikacije za zajednicu." />
     <title>TBD</title>
@@ -17,7 +18,7 @@
           // Tema radi i kad je lokalna pohrana blokirana.
         }
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        const mode = saved && saved !== 'system' && /^[a-z]+$/.test(saved) ? saved : dark ? 'dark' : 'light'
+        const mode = saved && saved !== 'system' && /^[a-z]+$/.test(saved) ? saved : dark ? 'forest' : 'garden'
         document.documentElement.dataset.theme = mode
       })()
     </script>

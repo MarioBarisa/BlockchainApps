@@ -8,4 +8,5 @@ coverage/
 !.env.example
 .DS_Store
 HardhatInfo.md
+/frontend/public/deployments/localhost.json
 

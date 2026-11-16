@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { appConfig } from '@/config/app'
+import { useWalletStore } from '@/stores/wallet'
 import AppIcon from '@/components/AppIcon.vue'
 import StatCard from '@/components/StatCard.vue'
 import SectionHeading from '@/components/SectionHeading.vue'
@@ -17,6 +18,7 @@ const steps = [
   { title: 'Odaberi projekt', text: 'Pregledaj ideje susjeda i vidi koliko im još nedostaje.', icon: 'compass' as const },
   { title: 'Podupri i prati', text: 'Svaki ether je vidljiv na blockchainu, od prvog do zadnjeg.', icon: 'shield-check' as const },
 ]
+const wallet = useWalletStore()
 </script>
 
 <template>
@@ -80,7 +82,7 @@ const steps = [
             <div class="mt-4 grid grid-cols-2 gap-3">
               <div class="rounded-md border border-base-300 bg-base-100 px-3 py-2">
                 <p class="text-[11px] uppercase tracking-wide text-base-content/65">Mreža</p>
-                <p class="mt-0.5 text-sm font-bold">{{ appConfig.network.name }}</p>
+                <p class="mt-0.5 text-sm font-bold">{{ wallet.network.name }}</p>
               </div>
               <div class="rounded-md border border-base-300 bg-base-100 px-3 py-2">
                 <p class="text-[11px] uppercase tracking-wide text-base-content/65">Ugovor</p>
